@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from IPython.display import display
 import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib import ticker
