@@ -7,10 +7,13 @@ import streamlit as st
 
 
 ### STEP ONE: read and clean the three sets of data (CBO21, CBO24, and OMB's outlays), reshape to long format, and concatenate them ###
+cbo24_datapath = 'data/cbo-2024-02-Spending-Projections.xlsx'
+cbo21_datapath = 'data/cbo-2021-02-11-spendingprojections.xlsx'
+omb_datapath = 'data/omb_ots_data.xlsx'
 
 #CBO24
 years = [i for i in range(2024, 2024+11)] 
-cbo_24 = pd.read_excel('../data/cbo-2024-02-Spending-Projections.xlsx', header=7, sheet_name=1)
+cbo_24 = pd.read_excel(cbo24_datapath, header=7, sheet_name=1)
 cbo_24 = cbo_24[[col for col in cbo_24.columns if col not in years]] #remove the BA cols
 cbo_24.columns = cbo_24.columns.str.replace('.1', '') #clean the OT cols
 cbo_24 = cbo_24.drop(columns=['Unnamed: 9', "Unnamed: 21", "Off-Budget?"]).drop(index=0).drop(cbo_24.index[-2:]) #drop the weird empty rows and the empty cols and offbud col
@@ -21,7 +24,7 @@ cbo_24_agencies['source'] = 'CBO24'
 cbo_24_agencies[[str(year) for year in range(2018,2024)]] = np.nan #to make the concat work
 
 #CBO21 
-cbo_21 = pd.read_excel('../data/cbo-2021-02-11-spendingprojections.xlsx', header=7, sheet_name=1)
+cbo_21 = pd.read_excel(cbo21_datapath, header=7, sheet_name=1)
 years_21 = [i for i in range(2021, 2032)]
 cbo_21 = cbo_21[[col for col in cbo_21.columns if col not in years_21]].drop(columns=["Off-Budget?", "Unnamed: 9", "Unnamed: 21"]) #remove the BA cols, unnamed and unnecessary columns
 cbo_21.columns = cbo_21.columns.str.replace('.1', '') #clean OT columns
@@ -33,7 +36,7 @@ cbo_21_agencies["source"] = "CBO21"
 cbo_21_agencies[["2018", "2019", "2020", "2032", "2033", "2034"]] = np.nan #to make the concat work
 
 #actual outlays (OMB)
-omb = pd.read_excel('../data/omb_ots_data.xlsx', header=2, sheet_name="Table")
+omb = pd.read_excel(omb_datapath, header=2, sheet_name="Table")
 actual_yrs = [str(i) for i in range(2018, 2024)]
 omb = omb[["Department or other unit"] + actual_yrs]
 omb.rename(columns={"Department or other unit": "Agency"}, inplace=True)
