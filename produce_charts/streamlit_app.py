@@ -45,7 +45,8 @@ def linechart_maker(agency):
 
 #Opening
 st.title("Biden's Big Government")
-st.write(f"President Biden has presided over a flood of government spending. His executive agencies have been the beneficiaries of this involuntary gift from taxpayers. Explore the data below to see how the outlays of {len(df['agency'].unique())} agencies have changed since Biden took office.")
+st.write(f"""President Biden has presided over a flood of government spending. His executive agencies have been the beneficiaries of this involuntary gift from taxpayers. 
+         Explore the data below to see how the projected outlays of {len(df['agency'].unique())} agencies have changed since Biden took office.""")
 #Chart maker
 agency = st.selectbox('Select an agency or start typing:', df['agency'].unique())
 linechart_maker(agency)
