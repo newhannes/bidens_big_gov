@@ -11,12 +11,16 @@ import streamlit as st
 
 ### STEP ONE: load data ###
 @st.cache_data
-df_long = pd.read_excel('data/agency_outlays.xlsx')
+df = pd.read_excel('output/agency_outlays.xlsx')
+#only include agencies that have an outlay for each year and each source
+agency_counts = df['agency'].value_counts()
+agencies_to_drop = agency_counts[agency_counts != 51].index 
+df = df[~df['agency'].isin(agencies_to_drop)].query('agency != "Allowances"') #also get rid of allowances cause its weird
 
 ### STEP TWO: charts ###
 
 def linechart_maker(agency):
-    df_agency = df_long[df_long['agency'] == agency]
+    df_agency = df[df['agency'] == agency]
     df_agency = df_agency.sort_values(by=['source','year'])
     df_agency['outlays'] = df_agency['outlays'] / 1000 #convert to billions
     sns.set_style('whitegrid')
@@ -39,7 +43,10 @@ def linechart_maker(agency):
     st.pyplot(plt.gcf())
 
 ### STEP THREE: Streamlit app ###
+
+#Opening
 st.title("Biden's Big Government")
-st.write("Projected Outlays Before Biden vs. Now")
-agency = st.selectbox('Select an agency:', df_long['agency'].unique())
+st.write(f"President Biden has presided over a flood of government spending. His executive agencies have been the beneficiaries of this involuntary gift from taxpayers. Explore the data below to see how the outlays of {len(df['agency'].unique())} agencies have changed since Biden took office.")
+#Chart maker
+agency = st.selectbox('Select an agency or start typing:', df['agency'].unique())
 linechart_maker(agency)
