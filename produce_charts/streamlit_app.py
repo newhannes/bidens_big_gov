@@ -10,7 +10,6 @@ import streamlit as st
 
 
 ### STEP ONE: load data ###
-@st.cache_data
 df = pd.read_excel('output/agency_outlays.xlsx')
 #only include agencies that have an outlay for each year and each source
 agency_counts = df['agency'].value_counts()
