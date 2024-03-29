@@ -4,9 +4,9 @@ outlays taken from OMB data are also displayed.
 The main purpose of having this repo is to use Streamlit Community Cloud to host the app that produces charts for each agency comparing the two projections.
 
 ## App Version History
-0.1 - launch app with the dropdown consisting of all unique values in the CBO24 "agency" column
-0.2 - separate the cleaning and merging of the three datasets from the app
-0.3 - for the drop down menu, only include "agencies" that have outlays recorded for all three sources
+- 0.1 - launch app with the dropdown consisting of all unique values in the CBO24 "agency" column
+- 0.2 - separate the cleaning and merging of the three datasets from the app
+- 0.3 - for the drop down menu, only include "agencies" that have outlays recorded for all three sources
 
 ## Random Notes
 (0.3) There are some agencies that don't really have significant differences (or are less than before):
