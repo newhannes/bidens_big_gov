@@ -72,35 +72,35 @@ def barchart_maker(agency):
         t.set_text(l)
     st.pyplot(plt.gcf())
 
-def barchart_maker_og(agency):
-    plt.figure(figsize=(12, 5.3))
-    sns.set_style('white')
-    barchart_df = increase_by_program[increase_by_program['Agency'] == agency]
-    if agency == "Department of the Treasury":
-        barchart_df = barchart_df[barchart_df['Bureau'] != 'Fiscal Service'] #this just doesnt show up well compared to the massive inc in interest
-    if agency == "Department of Commerce":
-        barchart_df.loc[barchart_df['Bureau'] == "National Oceanic and Atmospheric Administration", "Bureau"] = "NOAA"
-        barchart_df.loc[barchart_df['Bureau'] == "National Institute of Standards and Technology", "Bureau"] = "NIST"
-        barchart_df.loc[barchart_df["Bureau"] == "National Telecommunications and Information Administration", "Bureau"] = "NTIA"
-    barchart_df = pd.melt(barchart_df, id_vars='Bureau', value_vars=['22-31', '25-34'], var_name='10-year Projections', value_name='Value').sort_values(by=["10-year Projections"], ascending=True)
-    barchart_df['Value'] = barchart_df['Value'] / 1000
-    ax = barchart = sns.barplot(data=barchart_df, x='Bureau', y='Value', hue='10-year Projections', palette={'22-31': '#84AE95', '25-34': '#004647'})
-    #values on bars method 1:
-    for i in ax.containers:
-        ax.bar_label(i, labels = [f"${x:,.0f}" for x in i.datavalues], weight="bold", fontsize = 12)
+# def barchart_maker_og(agency):
+#     plt.figure(figsize=(12, 5.3))
+#     sns.set_style('white')
+#     barchart_df = increase_by_program[increase_by_program['Agency'] == agency]
+#     if agency == "Department of the Treasury":
+#         barchart_df = barchart_df[barchart_df['Bureau'] != 'Fiscal Service'] #this just doesnt show up well compared to the massive inc in interest
+#     if agency == "Department of Commerce":
+#         barchart_df.loc[barchart_df['Bureau'] == "National Oceanic and Atmospheric Administration", "Bureau"] = "NOAA"
+#         barchart_df.loc[barchart_df['Bureau'] == "National Institute of Standards and Technology", "Bureau"] = "NIST"
+#         barchart_df.loc[barchart_df["Bureau"] == "National Telecommunications and Information Administration", "Bureau"] = "NTIA"
+#     barchart_df = pd.melt(barchart_df, id_vars='Bureau', value_vars=['22-31', '25-34'], var_name='10-year Projections', value_name='Value').sort_values(by=["10-year Projections"], ascending=True)
+#     barchart_df['Value'] = barchart_df['Value'] / 1000
+#     ax = barchart = sns.barplot(data=barchart_df, x='Bureau', y='Value', hue='10-year Projections', palette={'22-31': '#84AE95', '25-34': '#004647'})
+#     #values on bars method 1:
+#     for i in ax.containers:
+#         ax.bar_label(i, labels = [f"${x:,.0f}" for x in i.datavalues], weight="bold", fontsize = 12)
    
-    plt.title(f'{agency} \n 10-Year Outlay Increases by Program \n', weight='bold', fontsize=16)
-    plt.ylabel('Outlays \n (in billions)')
+#     plt.title(f'{agency} \n 10-Year Outlay Increases by Program \n', weight='bold', fontsize=16)
+#     plt.ylabel('Outlays \n (in billions)')
 
-    plt.xlabel('')
-    sns.despine()
-    plt.gca().yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f'${x:,.0f}'))
+#     plt.xlabel('')
+#     sns.despine()
+#     plt.gca().yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f'${x:,.0f}'))
     
-    legend = barchart.get_legend() # Get the current legend
-    legend.set_title('')
-    for t, l in zip(legend.texts, ('2021 Projection', '2024 Projection')): # Rename the legend labels
-        t.set_text(l)
-    st.pyplot(plt.gcf())
+#     legend = barchart.get_legend() # Get the current legend
+#     legend.set_title('')
+#     for t, l in zip(legend.texts, ('2021 Projection', '2024 Projection')): # Rename the legend labels
+#         t.set_text(l)
+#     st.pyplot(plt.gcf())
 
 ### STEP THREE: Streamlit app ###
 
@@ -145,5 +145,5 @@ if page == "Case Studies":
     st.markdown("##### Program increases behind the change:")
     increase_by_program = pd.read_excel('output/program_increases.xlsx', sheet_name="top three bureaus for agency")
     barchart_maker(agency)
-    st.markdown("##### Chart with y-axis:")
-    barchart_maker_og(agency)
+    # st.markdown("##### Chart with y-axis:")
+    # barchart_maker_og(agency)
