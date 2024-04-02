@@ -86,7 +86,7 @@ if page == "Case Studies":
                      "Department of Transportation", "Environmental Protection Agency"]
     agency = st.selectbox('Select an agency:', case_studies)
 
-    cs_increase = pd.read_excel('output/cbo_projection_changes.xlsx', sheet_name="case studies increases by agency")
+    cs_increase = pd.read_excel('output/cbo_projection_changes.xlsx', sheet_name="cs inc by agency")
     cs_increase = cs_increase[cs_increase['Agency'] == agency]
     st.subheader(f"{agency}")
     st.markdown("##### Changes in projected outlays (in billions)")
