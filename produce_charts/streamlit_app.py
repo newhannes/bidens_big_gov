@@ -44,7 +44,7 @@ def linechart_maker(agency):
 def barchart_maker(agency):
     plt.figure(figsize=(12, 5.3))
     sns.set_style('white')
-    barchart_df = cs_increase_programs[cs_increase_programs['Agency'] == agency]
+    barchart_df = increase_by_program[increase_by_program['Agency'] == agency]
     barchart_df = pd.melt(barchart_df, id_vars='Title', value_vars=['22-31', '25-34'], var_name='10-year Projections', value_name='Value').sort_values(by=["10-year Projections"], ascending=True)
     barchart_df['Value'] = barchart_df['Value'] / 1000
     barchart = sns.barplot(data=barchart_df, x='Title', y='Value', hue='10-year Projections', palette={'22-31': '#84AE95', '25-34': '#004647'})
@@ -101,5 +101,5 @@ if page == "Case Studies":
 
     st.write('\n')
     st.markdown("##### Program increases behind the change:")
-    cs_increase_programs = pd.read_excel('output\program_increases.xlsx', sheet_name="case studies")
+    increase_by_program = pd.read_excel('output/program_increases.xlsx', sheet_name="top three bureaus for agency")
     barchart_maker(agency)
