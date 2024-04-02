@@ -37,19 +37,29 @@ def linechart_maker(agency):
     for t, l in zip(legend.texts, ('CBO 2021 Projection', 'CBO 2024 Projection', 'Actual Outlays')): # Rename the legend labels
         t.set_text(l)
     
-    plt.gca().yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f'${x:.0f}'))
+    plt.gca().yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f'${x:,.0f}'))
     sns.despine(offset=15, left=True)
     st.pyplot(plt.gcf())
 
 def barchart_maker(agency):
     plt.figure(figsize=(12, 5.3))
-    sns.set_style('white')
+    sns.set_style('whitegrid')
     barchart_df = increase_by_program[increase_by_program['Agency'] == agency]
-    barchart_df = pd.melt(barchart_df, id_vars='Title', value_vars=['22-31', '25-34'], var_name='10-year Projections', value_name='Value').sort_values(by=["10-year Projections"], ascending=True)
+    if agency == "Department of the Treasury":
+        barchart_df = barchart_df[barchart_df['Bureau'] != 'Fiscal Service'] #this just doesnt show up well compared to the massive inc in interest
+    if agency == "Department of Commerce":
+        barchart_df.loc[barchart_df['Bureau'] == "National Oceanic and Atmospheric Administration", "Bureau"] = "NOAA"
+        barchart_df.loc[barchart_df['Bureau'] == "National Institute of Standards and Technology", "Bureau"] = "NIST"
+        barchart_df.loc[barchart_df["Bureau"] == "National Telecommunications and Information Administration", "Bureau"] = "NTIA"
+    barchart_df = pd.melt(barchart_df, id_vars='Bureau', value_vars=['22-31', '25-34'], var_name='10-year Projections', value_name='Value').sort_values(by=["10-year Projections"], ascending=True)
     barchart_df['Value'] = barchart_df['Value'] / 1000
-    barchart = sns.barplot(data=barchart_df, x='Title', y='Value', hue='10-year Projections', palette={'22-31': '#84AE95', '25-34': '#004647'})
+    ax = barchart = sns.barplot(data=barchart_df, x='Bureau', y='Value', hue='10-year Projections', palette={'22-31': '#84AE95', '25-34': '#004647'})
+    #values on bars method 1:
+    for i in ax.containers:
+        ax.bar_label(i, labels = [f"${x:,.0f}" for x in i.datavalues], weight="bold", fontsize = 12)
+   
     plt.title(f'{agency} \n 10-Year Outlay Increases by Program', weight='bold', fontsize=16)
-    plt.ylabel('Outlay Increase \n (in billions)')
+    plt.ylabel('Outlays \n (in billions)')
     plt.xlabel('')
     sns.despine()
     plt.gca().yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f'${x:,.0f}'))

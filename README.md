@@ -8,7 +8,7 @@ The main purpose of having this repo is to use Streamlit Community Cloud to host
 - 0.2 - separate the cleaning and merging of the three datasets from the app
 - 0.3 - for the drop down menu, only include "agencies" that have outlays recorded for all three sources
 - 0.4 - add case studies page, switch largest increases to largest dollar increases rather than largest percent increases 
-- 0.5 - instead of looking at "Title" for programmatic increases, look at "Bureau" 
+- 0.5 - instead of looking at "Title" for programmatic increases, look at "Bureau", drop "Fiscal Services" bureau from the Treasury's increases as it just fades to oblivion with the debt increases, add values on bars 
 
 ## Random Notes
 (0.5) There are 13 Agency-Bureau combinations in the 2024 CBO that are not in 2021 CBO. There are 8 Agency-Bureau combinations in the 2021 CBO that are not in the 2024 CBO. See "Differences" section below for the mismatches. A few are just renamed bureaus. Only two mismatchs are in agencies in our case studies so I am content to let this sit. Also, EPA has no bureaus so for both CBO21 and CBO24 data I replaced the "Bureau" entries with the "Title" entries. 
