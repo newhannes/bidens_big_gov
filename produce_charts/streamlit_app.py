@@ -63,7 +63,7 @@ def barchart_maker(agency):
 ### STEP THREE: Streamlit app ###
 
 #sidebar
-page = st.sidebar.radio("Go to page", ["Home", "Case Studies" "About"])
+page = st.sidebar.radio("Go to page", ["Home", "Case Studies", "About"])
 rd_file_path = "README.md"
 
 if page == "Home":
