@@ -45,16 +45,23 @@ def barchart_maker(agency):
     plt.figure(figsize=(12, 5.3))
     sns.set_style('white')
     barchart_df = increase_by_program[increase_by_program['Agency'] == agency]
-    if agency == "Department of the Treasury":
-        barchart_df = barchart_df[barchart_df['Bureau'] != 'Fiscal Service'] #this just doesnt show up well compared to the massive inc in interest
+    
+    if barchart_df.shape[0] < 3:
+        barchart_df = barchart_df.sort_values(by="dollar_change", ascending=False)
+    else:  
+        barchart_df = barchart_df.sort_values(by="dollar_change", ascending=False).head(3)
+    
     if agency == "Department of Commerce":
         barchart_df.loc[barchart_df['Bureau'] == "National Oceanic and Atmospheric Administration", "Bureau"] = "NOAA"
         barchart_df.loc[barchart_df['Bureau'] == "National Institute of Standards and Technology", "Bureau"] = "NIST"
         barchart_df.loc[barchart_df["Bureau"] == "National Telecommunications and Information Administration", "Bureau"] = "NTIA"
+    if agency == "Department of the Treasury":
+        barchart_df = barchart_df[barchart_df['Bureau'] != 'Fiscal Service'] #this just doesnt show up well compared to the massive inc in interest
+
     barchart_df = pd.melt(barchart_df, id_vars='Bureau', value_vars=['22-31', '25-34'], var_name='10-year Projections', value_name='Value').sort_values(by=["10-year Projections"], ascending=True)
     barchart_df['Value'] = barchart_df['Value'] / 1000
     ax = barchart = sns.barplot(data=barchart_df, x='Bureau', y='Value', hue='10-year Projections', palette={'22-31': '#84AE95', '25-34': '#004647'})
-    #values on bars method 1:
+
     for i in ax.containers:
         ax.bar_label(i, labels = [f"${x:,.0f}" for x in i.datavalues], weight="bold", fontsize = 12)
    
@@ -67,40 +74,14 @@ def barchart_maker(agency):
     plt.gca().yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f'${x:,.0f}'))
     
     legend = barchart.get_legend() # Get the current legend
-    legend.set_title('')
-    for t, l in zip(legend.texts, ('2021 Projection', '2024 Projection')): # Rename the legend labels
-        t.set_text(l)
+    try:
+        legend.set_title('')
+        for t, l in zip(legend.texts, ('2021 Projection', '2024 Projection')): # Rename the legend labels
+            t.set_text(l)
+    except:
+        st.write(barchart_df)
+        raise ValueError("This agency currently has no data to show.")
     st.pyplot(plt.gcf())
-
-# def barchart_maker_og(agency):
-#     plt.figure(figsize=(12, 5.3))
-#     sns.set_style('white')
-#     barchart_df = increase_by_program[increase_by_program['Agency'] == agency]
-#     if agency == "Department of the Treasury":
-#         barchart_df = barchart_df[barchart_df['Bureau'] != 'Fiscal Service'] #this just doesnt show up well compared to the massive inc in interest
-#     if agency == "Department of Commerce":
-#         barchart_df.loc[barchart_df['Bureau'] == "National Oceanic and Atmospheric Administration", "Bureau"] = "NOAA"
-#         barchart_df.loc[barchart_df['Bureau'] == "National Institute of Standards and Technology", "Bureau"] = "NIST"
-#         barchart_df.loc[barchart_df["Bureau"] == "National Telecommunications and Information Administration", "Bureau"] = "NTIA"
-#     barchart_df = pd.melt(barchart_df, id_vars='Bureau', value_vars=['22-31', '25-34'], var_name='10-year Projections', value_name='Value').sort_values(by=["10-year Projections"], ascending=True)
-#     barchart_df['Value'] = barchart_df['Value'] / 1000
-#     ax = barchart = sns.barplot(data=barchart_df, x='Bureau', y='Value', hue='10-year Projections', palette={'22-31': '#84AE95', '25-34': '#004647'})
-#     #values on bars method 1:
-#     for i in ax.containers:
-#         ax.bar_label(i, labels = [f"${x:,.0f}" for x in i.datavalues], weight="bold", fontsize = 12)
-   
-#     plt.title(f'{agency} \n 10-Year Outlay Increases by Program \n', weight='bold', fontsize=16)
-#     plt.ylabel('Outlays \n (in billions)')
-
-#     plt.xlabel('')
-#     sns.despine()
-#     plt.gca().yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f'${x:,.0f}'))
-    
-#     legend = barchart.get_legend() # Get the current legend
-#     legend.set_title('')
-#     for t, l in zip(legend.texts, ('2021 Projection', '2024 Projection')): # Rename the legend labels
-#         t.set_text(l)
-#     st.pyplot(plt.gcf())
 
 ### STEP THREE: Streamlit app ###
 
@@ -123,18 +104,22 @@ if page == "About":
 
 if page == "Case Studies":
     st.header("Case Studies")
-    st.write("Take a deeper dive into the data behind the increased spending projections for six key agencies.")
-    case_studies = ['Department of Agriculture', 'Department of Commerce', 'Department of Labor', "Department of the Treasury",
-                     "Department of Transportation", "Environmental Protection Agency"]
-    agency = st.selectbox('Select an agency:', case_studies)
-
-    cs_increase = pd.read_excel('output/cbo_projection_changes.xlsx', sheet_name="cs inc by agency")
-    cs_increase = cs_increase[cs_increase['Agency'] == agency]
+    #st.write("Take a deeper dive into the data behind the increased spending projections for six key agencies.")
+    agency_df = pd.read_excel('output/cbo_projection_changes.xlsx', sheet_name="agency increases").query("percent_change > 0") #all agencies with an increase
+    agency_df = agency_df[~agency_df["Agency"].isin(agencies_to_drop)]
+    st.write(f"Take a deeper dive into the data behind the increased spending projections for {agency_df['Agency'].nunique()} agencies.")
+    
+    #case_studies = ['Department of Agriculture', 'Department of Commerce', 'Department of Labor', "Department of the Treasury",
+    #                 "Department of Transportation", "Environmental Protection Agency"]
+    agency = st.selectbox('Select an agency:', agency_df['Agency'].unique())
+    agency_df = agency_df[agency_df['Agency'] == agency]
+    #cs_increase = pd.read_excel('output/cbo_projection_changes.xlsx', sheet_name="cs inc by agency")
+    #cs_increase = cs_increase[cs_increase['Agency'] == agency]
     st.subheader(f"{agency}")
     st.markdown("##### Changes in projected outlays (in billions)")
-    cs_21 = f"${int(round(cs_increase['22-31'].values[0] / 1000, 0)):,}"
-    cs_24 = f"${int(round(cs_increase['25-34'].values[0] / 1000,0)):,}"
-    cs_pct = f"{round(cs_increase['percent_change'].values[0])}%"
+    cs_21 = f"${int(round(agency_df['22-31'].values[0] / 1000, 0)):,}"
+    cs_24 = f"${int(round(agency_df['25-34'].values[0] / 1000,0)):,}"
+    cs_pct = f"{round(agency_df['percent_change'].values[0])}%"
 
     col1, col2, col3 = st.columns(3)
     col1.metric(label="10 Year Projection in 2021", value=cs_21)
@@ -143,7 +128,6 @@ if page == "Case Studies":
 
     st.write('\n')
     st.markdown("##### Program increases behind the change:")
-    increase_by_program = pd.read_excel('output/program_increases.xlsx', sheet_name="top three bureaus for agency")
+    increase_by_program = pd.read_excel("output/cbo_projection_changes.xlsx", sheet_name="agency-bureau inc").query('percent_change > 0') #filter out decreases in spending
+    
     barchart_maker(agency)
-    # st.markdown("##### Chart with y-axis:")
-    # barchart_maker_og(agency)
